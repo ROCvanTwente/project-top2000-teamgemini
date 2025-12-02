@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateJwtProject", "..\Project-Top2000-API\TemplateJwtProject.csproj", "{C82B6105-5CA0-4E23-A70A-B2671A2CEF92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Top2000.Frontend", "..\frontend\Top2000.Frontend\Top2000.Frontend.csproj", "{ECEE6189-F194-4868-95A0-329BB24CE9B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C82B6105-5CA0-4E23-A70A-B2671A2CEF92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C82B6105-5CA0-4E23-A70A-B2671A2CEF92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C82B6105-5CA0-4E23-A70A-B2671A2CEF92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C82B6105-5CA0-4E23-A70A-B2671A2CEF92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEE6189-F194-4868-95A0-329BB24CE9B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECEE6189-F194-4868-95A0-329BB24CE9B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECEE6189-F194-4868-95A0-329BB24CE9B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECEE6189-F194-4868-95A0-329BB24CE9B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

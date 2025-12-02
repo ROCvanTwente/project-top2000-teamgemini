@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="TemplateJwtProject/TemplateJwtProject.csproj" />
+  <Project Path="../Project-Top2000-Frontend/Project-Top2000-Frontend.csproj" />
 </Solution>

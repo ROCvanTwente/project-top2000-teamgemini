@@ -61,7 +61,6 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 // Add MVC with views and controllers
 builder.Services.AddControllersWithViews();
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

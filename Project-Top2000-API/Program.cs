@@ -55,30 +55,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS configuratie
-var corsSettings = builder.Configuration.GetSection("CorsSettings");
-var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:1234" };
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("DefaultCorsPolicy", policy =>
-    {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
-
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+// Add MVC with views and controllers
+builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Get BaseUrl from configuration
+var baseUrl = builder.Configuration["BaseUrl"] ?? "/";
+app.UsePathBase(baseUrl);
 
 // Initialiseer rollen
 using (var scope = app.Services.CreateScope())
@@ -94,13 +85,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// CORS middleware (voor Authentication en Authorization!)
-app.UseCors("DefaultCorsPolicy");
+app.UseStaticFiles();
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,0 +1,4 @@
+<Solution>
+<Project Path="Project-Top2000-API/TemplateJwtProject.csproj" />
+<Project Path="Top2000.Testing/Top2000.Testing.csproj" Id="3d88fc15-22be-414c-ab0e-7c637511d222" />
+</Solution>

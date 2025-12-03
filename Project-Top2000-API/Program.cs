@@ -74,8 +74,6 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("AllowVercel");
 
-
-
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -102,7 +100,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // CORS middleware (voor Authentication en Authorization!)
-app.UseCors("DefaultCorsPolicy");
+app.UseCors("AllowVercel");
 
 app.UseAuthentication();
 app.UseAuthorization();

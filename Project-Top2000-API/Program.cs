@@ -61,14 +61,20 @@ var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() ?
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DefaultCorsPolicy", policy =>
-    {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
+    options.AddPolicy("AllowVercel",
+        builder => builder
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://project-top2000-frontend-teamgemini-gf2w7z628.vercel.app")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
 });
+
+var app = builder.Build();
+app.UseCors("AllowVercel");
+
+
 
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();

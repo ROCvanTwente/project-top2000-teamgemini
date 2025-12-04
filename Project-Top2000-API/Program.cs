@@ -18,14 +18,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Identity configuratie
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Password settings
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
-    
-    // User settings
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
@@ -55,20 +52,23 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS configuratie
+// CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
-var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:1234" };
+var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
+                     ?? new[] { "http://localhost:3000", "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVercel",
-        builder => builder
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "https://project-top2000-frontend-teamgemini-gf2w7z628.vercel.app")
+    options.AddPolicy("DefaultCorsPolicy", policyBuilder =>
+    {
+        policyBuilder
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            // If your frontend uses cookies or fetch(..., { credentials: 'include' })
+            // enable credentials (and ensure origins are explicit, not '*')
+            .AllowCredentials();
+    });
 });
 
 // Services
@@ -76,7 +76,6 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -96,8 +95,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// CORS middleware (voor Authentication en Authorization!)
-app.UseCors("AllowVercel");
+// IMPORTANT: call __UseCors__ before authentication/authorization
+app.UseCors("DefaultCorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();

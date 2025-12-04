@@ -11,22 +11,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Database configuratie
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Allow disabling database/identity during development
+var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", false);
+Console.WriteLine($"UseDatabase: {useDatabase}");
 
-// Identity configuratie
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+// Database configuratie (conditional)
+if (useDatabase)
 {
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    // Identity configuratie
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+}
 
 // JWT Authentication configuratie
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -86,11 +93,14 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Initialiseer rollen
-using (var scope = app.Services.CreateScope())
+// Initialiseer rollen (only when database/identity is enabled)
+if (useDatabase)
 {
-    var services = scope.ServiceProvider;
-    await RoleInitializer.InitializeAsync(services);
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        await RoleInitializer.InitializeAsync(services);
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -101,6 +111,9 @@ if (app.Environment.IsDevelopment())
 }       
 
 app.UseHttpsRedirection();
+
+// Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
+app.UseRouting();
 
 // IMPORTANT: call __UseCors__ before authentication/authorization
 app.UseCors("DefaultCorsPolicy");

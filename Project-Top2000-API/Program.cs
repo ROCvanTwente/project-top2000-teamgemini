@@ -91,7 +91,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
 // Initialiseer rollen (only when database/identity is enabled)
 if (useDatabase)

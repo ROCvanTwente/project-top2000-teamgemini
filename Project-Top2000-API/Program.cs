@@ -86,11 +86,19 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Initialiseer rollen
+// Initialiseer rollen - tolerant when DB is not available (for local testing without DB)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await RoleInitializer.InitializeAsync(services);
+    try
+    {
+        await RoleInitializer.InitializeAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetService<ILogger<Program>>();
+        logger?.LogWarning(ex, "Role initialization skipped because the database is not available. Starting without Identity DB for local testing.");
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -98,9 +106,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}       
+}
 
-app.UseHttpsRedirection();
+// Only redirect HTTP->HTTPS in non-development environments to avoid breaking CORS preflight locally
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // IMPORTANT: call __UseCors__ before authentication/authorization
 app.UseCors("DefaultCorsPolicy");

@@ -55,7 +55,11 @@ builder.Services.AddAuthentication(options =>
 // CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
-                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "https://teamgeminiapi.runasp.net" };
+                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "https://teamgeminiapi.runasp.net", "http://localhost:5237" };
+
+builder.Logging.AddConsole();
+builder.Services.AddSingleton(_ => allowedOrigins);
+Console.WriteLine("CORS allowed origins: " + string.Join(", ", allowedOrigins));
 
 builder.Services.AddCors(options =>
 {
@@ -76,7 +80,9 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+// Use Swagger/OpenAPI compatible with .NET 8
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -90,8 +96,9 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-}
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}       
 
 app.UseHttpsRedirection();
 

@@ -57,10 +57,6 @@ var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
                      ?? new[] { "http://localhost:3000", "http://localhost:5173", "https://teamgeminiapi.runasp.net" };
 
-builder.Logging.AddConsole();
-builder.Services.AddSingleton(_ => allowedOrigins);
-Console.WriteLine("CORS allowed origins: " + string.Join(", ", allowedOrigins));
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultCorsPolicy", policyBuilder =>

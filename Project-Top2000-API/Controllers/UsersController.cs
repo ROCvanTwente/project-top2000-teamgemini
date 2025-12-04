@@ -1,19 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-public class UsersController : Controller
+namespace Project_Top2000_API.Controllers
 {
-    [HttpGet]
-    public IActionResult Index()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsersController : ControllerBase
     {
-        // Dummy data als placeholder
-        var users = new List<object>
-        {
-            new { id = 1, name = "Alice" },
-            new { id = 2, name = "Bob" },
-            new { id = 3, name = "Charlie" }
-        };
+        public sealed record UserDto(int Id, string Name);
 
-        return Json(users); // JSON teruggeven naar React
+        [HttpGet]
+        public ActionResult<IEnumerable<UserDto>> Get()
+        {
+            var users = new List<UserDto>
+            {
+                new(1, "Alice"),
+                new(2, "Bob"),
+                new(3, "Charlie")
+            };
+
+            return Ok(users);
+        }
     }
 }

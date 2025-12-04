@@ -71,9 +71,6 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-var app = builder.Build();
-app.UseCors("AllowVercel");
-
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();

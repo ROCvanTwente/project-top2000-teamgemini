@@ -87,28 +87,19 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddControllers();
-// Use Swagger/OpenAPI compatible with .NET 8
+// Use Swagger/OpenAPI compatible with .NET 10
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
 // Initialiseer rollen (only when database/identity is enabled)
-if (useDatabase)
-{
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
         await RoleInitializer.InitializeAsync(services);
     }
-}
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}       
+      
 
 app.UseHttpsRedirection();
 

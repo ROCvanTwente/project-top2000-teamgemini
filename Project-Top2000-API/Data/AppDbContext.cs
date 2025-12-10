@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TemplateJwtProject.Models;
@@ -26,5 +27,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<RefreshToken>()
             .HasIndex(rt => rt.Token)
             .IsUnique();
+        builder.Entity<Top2000Entry>()
+    .HasKey(e => new { e.SongId, e.Year });
+
     }
 }

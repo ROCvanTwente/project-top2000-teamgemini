@@ -1,7 +1,10 @@
-﻿namespace TemplateJwtProject.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TemplateJwtProject.Models
 {
-    public class Song
+    public class Songs
     {
+        [Key]
         public int SongId { get; set; }
 
         // Foreign key

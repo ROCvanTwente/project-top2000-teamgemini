@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace TemplateJwtProject.Migrations
 {
     /// <inheritdoc />
-    public partial class Models : Migration
+    public partial class MainDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,8 +27,9 @@ namespace TemplateJwtProject.Migrations
                     table.PrimaryKey("PK_Artist", x => x.ArtistId);
                 });
 
+
             migrationBuilder.CreateTable(
-                name: "Song",
+                name: "Songs",
                 columns: table => new
                 {
                     SongId = table.Column<int>(type: "int", nullable: false)
@@ -41,14 +43,15 @@ namespace TemplateJwtProject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Song", x => x.SongId);
+                    table.PrimaryKey("PK_Songs", x => x.SongId);
                     table.ForeignKey(
-                        name: "FK_Song_Artist_ArtistId",
+                        name: "FK_Songs_Artist_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artist",
                         principalColumn: "ArtistId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
 
             migrationBuilder.CreateTable(
                 name: "Top2000Entry",
@@ -62,27 +65,30 @@ namespace TemplateJwtProject.Migrations
                 {
                     table.PrimaryKey("PK_Top2000Entry", x => new { x.SongId, x.Year });
                     table.ForeignKey(
-                        name: "FK_Top2000Entry_Song_SongId",
+                        name: "FK_Top2000Entry_Songs_SongId",
                         column: x => x.SongId,
-                        principalTable: "Song",
+                        principalTable: "Songs",
                         principalColumn: "SongId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
+
+
             migrationBuilder.CreateIndex(
-                name: "IX_Song_ArtistId",
-                table: "Song",
+                name: "IX_Songs_ArtistId",
+                table: "Songs",
                 column: "ArtistId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+
             migrationBuilder.DropTable(
                 name: "Top2000Entry");
 
             migrationBuilder.DropTable(
-                name: "Song");
+                name: "Songs");
 
             migrationBuilder.DropTable(
                 name: "Artist");

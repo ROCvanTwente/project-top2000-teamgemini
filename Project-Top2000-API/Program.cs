@@ -61,8 +61,8 @@ builder.Services.AddAuthentication(options =>
 
 // CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
-var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
-                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "http://localhost:5237", "https://teamgeminiapi.runasp.net", "https://teamgeminitestapi.runasp.net", "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app" };
+var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
+                     ?? new[] { "http://localhost:5173", "https://localhost:5173" };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);
@@ -94,20 +94,25 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Initialiseer rollen (only when database/identity is enabled)
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        await RoleInitializer.InitializeAsync(services);
-    }
-      
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await RoleInitializer.InitializeAsync(services);
+}
 
-app.UseHttpsRedirection();
 
 // Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
 app.UseRouting();
 
-// IMPORTANT: call __UseCors__ before authentication/authorization
+// IMPORTANT: call __UseCors__ before authentication/authorization and HTTPS redirection
+// to prevent preflight requests from being redirected (which causes CORS errors)
 app.UseCors("DefaultCorsPolicy");
+
+// Only use HTTPS redirection in production to avoid CORS preflight redirect issues in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -12,9 +12,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    public DbSet<Songs> Songs { get; set; }
-    public DbSet<Artist> Artists { get; set; }
-    public DbSet<Top2000Entry> Top2000Entries { get; set; }
+    public DbSet<Songs> Songs { get; set; } = null!;
+    public DbSet<Artist> Artist { get; set; } = null!;
+    public DbSet<Top2000Entry> Top2000Entry { get; set; } = null!;
 
 
 

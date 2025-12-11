@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TemplateJwtProject.Data;
+using System.Linq;
 
 namespace TemplateJwtProject.Controllers
 {
     [ApiController]
-    [Route("artist")]
+    [Route("Artist")]
     public class ArtiestenOverzichtController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -56,7 +57,8 @@ namespace TemplateJwtProject.Controllers
             // Filter op minimum aantal nummers
             if (minSongs.HasValue)
             {
-                query = query.Where(a => a.Songs.Count >= minSongs.Value);
+                // Use Count() so EF Core can translate to SQL
+                query = query.Where(a => a.Songs.Count() >= minSongs.Value);
             }
 
             // Filter op wel/geen biografie

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace TemplateJwtProject.Models
 {
@@ -12,7 +13,7 @@ namespace TemplateJwtProject.Models
         public int Year { get; set; }
         public int Position { get; set; }
 
-        // Navigatie-eigenschap
+        [JsonIgnore]
         public Songs Songs { get; set; } = null!;
     }
 

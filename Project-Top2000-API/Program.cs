@@ -61,8 +61,8 @@ builder.Services.AddAuthentication(options =>
 
 // CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
-var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
-                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "http://localhost:5237", "https://teamgeminiapi.runasp.net" };
+var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
+                     ?? new[] { "http://localhost:5173", "https://localhost:5173" };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);
@@ -94,12 +94,11 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Initialiseer rollen (only when database/identity is enabled)
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        await RoleInitializer.InitializeAsync(services);
-    }
-      
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await RoleInitializer.InitializeAsync(services);
+}
 
 // Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
 app.UseRouting();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TemplateJwtProject.Data;
+using TemplateJwtProject.Models;
 
 namespace TemplateJwtProject.Controllers
 {
@@ -18,7 +19,7 @@ namespace TemplateJwtProject.Controllers
         [HttpGet("{year}")]
         public async Task<IActionResult> GetTop2000ByYear(int year)
         {
-            var list = await _context.Set<TemplateJwtProject.Models.Top2000Entry>()
+            var list = await _context.Set<Top2000Entry>()
                 .Where(t => t.Year == year)
                 .Include(t => t.Songs)
                     .ThenInclude(s => s.Artist)
@@ -38,5 +39,6 @@ namespace TemplateJwtProject.Controllers
 
             return Ok(list);
         }
+
     }
 }

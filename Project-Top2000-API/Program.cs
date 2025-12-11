@@ -101,13 +101,18 @@ var app = builder.Build();
     }
       
 
-app.UseHttpsRedirection();
-
 // Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
 app.UseRouting();
 
-// IMPORTANT: call __UseCors__ before authentication/authorization
+// IMPORTANT: call __UseCors__ before authentication/authorization and HTTPS redirection
+// to prevent preflight requests from being redirected (which causes CORS errors)
 app.UseCors("DefaultCorsPolicy");
+
+// Only use HTTPS redirection in production to avoid CORS preflight redirect issues in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -100,7 +100,6 @@ using (var scope = app.Services.CreateScope())
     await RoleInitializer.InitializeAsync(services);
 }
 
-
 // Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
 app.UseRouting();
 

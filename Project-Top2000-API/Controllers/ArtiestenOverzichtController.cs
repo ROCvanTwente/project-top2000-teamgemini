@@ -5,7 +5,7 @@ using TemplateJwtProject.Data;
 namespace TemplateJwtProject.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("artist")]
     public class ArtiestenOverzichtController : ControllerBase
     {
         private readonly AppDbContext _context;

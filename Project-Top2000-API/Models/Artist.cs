@@ -1,4 +1,6 @@
-﻿namespace TemplateJwtProject.Models
+﻿using System.Text.Json.Serialization;
+
+namespace TemplateJwtProject.Models
 {
     public class Artist
     {
@@ -7,6 +9,7 @@
         public string? Wiki { get; set; }
         public string? Biography { get; set; }
         public string? Photo { get; set; }
+
 
         // Navigatie-eigenschap (EF Core)
         public ICollection<Songs> Songs { get; set; } = new List<Songs>();

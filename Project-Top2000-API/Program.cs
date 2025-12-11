@@ -62,7 +62,7 @@ builder.Services.AddAuthentication(options =>
 // CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
-                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "http://localhost:5237", "https://teamgeminiapi.runasp.net" };
+                     ?? new[] { "http://localhost:3000", "http://localhost:5173", "http://localhost:5237", "https://teamgeminiapi.runasp.net", "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app" };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);

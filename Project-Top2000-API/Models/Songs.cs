@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TemplateJwtProject.Models
 {
@@ -17,6 +18,7 @@ namespace TemplateJwtProject.Models
         public string? Youtube { get; set; }
 
         // Navigatie-eigenschappen
+        [JsonIgnore]
         public Artist Artist { get; set; } = null!;
         public ICollection<Top2000Entry> Top2000Entries { get; set; } = new List<Top2000Entry>();
     }

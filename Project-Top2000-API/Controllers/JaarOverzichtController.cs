@@ -19,26 +19,25 @@ namespace TemplateJwtProject.Controllers
         [HttpGet("{year}")]
         public async Task<IActionResult> GetTop2000ByYear(int year)
         {
-            var list = await _context.Set<Top2000Entry>()
-                .Where(t => t.Year == year)
-                .Include(t => t.Songs)
-                    .ThenInclude(s => s.Artist)
-                .OrderBy(t => t.Position)
-                .Select(t => new
+            var entries = await _context.Set<Top2000Entry>()
+                .Where(entry => entry.Year == year)
+                .Include(entry => entry.Songs)
+                    .ThenInclude(song => song.Artist)
+                .OrderBy(entry => entry.Position)
+                .Select(entry => new
                 {
-                    SongId = t.Songs.SongId,
-                    Position = t.Position,
-                    Title = t.Songs.Titel,
-                    Artist = t.Songs.Artist.Name,
-                    ReleaseYear = t.Songs.ReleaseYear
+                    SongId = entry.Songs.SongId,
+                    Position = entry.Position,
+                    Title = entry.Songs.Titel,
+                    Artist = entry.Songs.Artist.Name,
+                    ReleaseYear = entry.Songs.ReleaseYear,
                 })
                 .ToListAsync();
 
-            if (!list.Any())
+            if (!entries.Any())
                 return NotFound($"Geen Top2000 entries gevonden voor jaar {year}.");
 
-            return Ok(list);
+            return Ok(entries);
         }
-
     }
 }

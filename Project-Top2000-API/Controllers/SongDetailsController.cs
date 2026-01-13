@@ -17,35 +17,49 @@ namespace TemplateJwtProject.Controllers
             _context = context;
         }
 
-        [HttpGet("{songId}/stats")]
-        public async Task<IActionResult> GetSongStats(int songId)
+
+        [HttpGet("{songId}")]
+        public async Task<IActionResult> GetSongDetails(int songId)
         {
             var song = await _context.Set<Songs>()
-                .Include(song => song.Artist)
-                .FirstOrDefaultAsync(song => song.SongId == songId);
+                .Include(s => s.Artist)
+                .Include(s => s.Top2000Entries)
+                .FirstOrDefaultAsync(s => s.SongId == songId);
 
             if (song == null)
                 return NotFound($"Song met id {songId} niet gevonden.");
 
-            var chartHistory = await _context.Set<Top2000Entry>()
-                .Where(entry => entry.SongId == songId)
-                .OrderByDescending(entry => entry.Year)
-                .Select(entry => new ChartDto
+            var positions = song.Top2000Entries
+                .OrderByDescending(e => e.Year)
+                .Select(e => new
                 {
-                    Year = entry.Year,
-                    Position = entry.Position
+                    Year = e.Year,
+                    Position = e.Position
                 })
-                .ToListAsync();
+                .ToList();
 
             var result = new Songsdto
             {
                 SongId = song.SongId,
-                Titel = song.Titel,
-                ArtistName = song.Artist?.Name ?? "",
-                Lyrics = song.Lyrics,
+                Title = song.Titel,
+                Artist = song.Artist.Name,
                 ReleaseYear = song.ReleaseYear,
-                ArtistBiography = song.Artist?.Biography,
-                ChartHistory = chartHistory
+                ImgUrl = song.ImgUrl,
+                Youtube = song.Youtube,
+                Lyrics = song.Lyrics,
+
+                Stats = new
+                {
+                    TimesListed = positions.Count,
+                    HighestPosition = positions.Any()
+        ? (int?)positions.Min(p => p.Position)
+        : null,
+                    FirstYear = positions.LastOrDefault()?.Year,
+                    LastYear = positions.FirstOrDefault()?.Year
+                },
+
+
+                Top2000Positions = positions
             };
 
             return Ok(result);

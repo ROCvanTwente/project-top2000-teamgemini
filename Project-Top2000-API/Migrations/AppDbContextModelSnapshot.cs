@@ -243,7 +243,7 @@ namespace TemplateJwtProject.Migrations
 
                     b.HasKey("ArtistId");
 
-                    b.ToTable("Artists");
+                    b.ToTable("Artist");
                 });
 
             modelBuilder.Entity("TemplateJwtProject.Models.RefreshToken", b =>
@@ -334,7 +334,7 @@ namespace TemplateJwtProject.Migrations
 
                     b.HasKey("SongId", "Year");
 
-                    b.ToTable("Top2000Entries");
+                    b.ToTable("Top2000Entry");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

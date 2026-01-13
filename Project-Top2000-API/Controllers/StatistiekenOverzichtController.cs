@@ -16,104 +16,113 @@ namespace TemplateJwtProject.Controllers
             _context = context;
         }
 
-        // 1. DALERS -> Gebruikt nu DalerDto
+        // 1. Dalers
         [HttpGet("dalers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<DalerDto>>> GetDalers(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetDalers(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<DalerDto>($"EXEC GetDalers @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetDalers @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 2. STIJGERS -> Gebruikt nu StijgerDto
+        // 2. Stijgers
         [HttpGet("stijgers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StijgerDto>>> GetStijgers(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetStijgers(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<StijgerDto>($"EXEC GetStijgers @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetStijgers @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 3. ALLE EDITIES -> Gebruikt BaseStatistiekDto (heeft alleen Titel/Artiest/Jaar nodig)
+        // 3. Alle Edities
         [HttpGet("alle-edities")]
-        public async Task<ActionResult<IEnumerable<BaseStatistiekDto>>> GetAlleEdities(int aantal = 50)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetAlleEdities([FromQuery] int aantal = 50)
         {
             var result = await _context.Database
-                .SqlQuery<BaseStatistiekDto>($"EXEC GetAlleEdities @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetAlleEdities @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 4. NIEUWE BINNENKOMERS -> Gebruikt StatistiekMetPositieDto
+        // 4. Nieuwe Binnenkomers
         [HttpGet("nieuwe-binnenkomers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StatistiekMetPositieDto>>> GetNieuweBinnenkomers(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetNieuweBinnenkomers(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<StatistiekMetPositieDto>($"EXEC GetNieuweBinnenkomers @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetNieuweBinnenkomers @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 5. VERDWENEN -> Gebruikt VerdwenenDto (PositieVorigJaar)
+        // 5. Verdwenen
         [HttpGet("verdwenen/{jaar}")]
-        public async Task<ActionResult<IEnumerable<VerdwenenDto>>> GetVerdwenen(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetVerdwenen(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<VerdwenenDto>($"EXEC GetVerdwenen @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetVerdwenen @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 6. OPNIEUW BINNEN -> Gebruikt StatistiekMetPositieDto
+        // 6. Opnieuw Binnen
         [HttpGet("opnieuw-binnen/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StatistiekMetPositieDto>>> GetOpnieuwBinnen(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetOpnieuwBinnen(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<StatistiekMetPositieDto>($"EXEC GetOpnieuwBinnen @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetOpnieuwBinnen @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 7. STABIEL -> Gebruikt StatistiekMetPositieDto
+        // 7. Stabiel
         [HttpGet("stabiel/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StatistiekMetPositieDto>>> GetStabiel(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetStabiel(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<StatistiekMetPositieDto>($"EXEC GetStabiel @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetStabiel @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 8. AANSLUITENDE POSITIES -> Gebruikt StatistiekMetPositieDto
+        // 8. Aansluitende Posities
         [HttpGet("aansluitende-posities/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StatistiekMetPositieDto>>> GetAansluitendePosities(int jaar, int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetAansluitendePosities(int jaar, [FromQuery] int aantal = 10)
         {
             var result = await _context.Database
-                .SqlQuery<StatistiekMetPositieDto>($"EXEC GetAansluitendePosities @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetAansluitendePosities @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 9. EENMALIGE NOTERINGEN -> Gebruikt EenmaligeNoteringDto
+        // 9. Eenmalige Noteringen
         [HttpGet("eenmalige-noteringen")]
-        public async Task<ActionResult<IEnumerable<EenmaligeNoteringDto>>> GetEenmaligeNoteringen(int aantal = 20)
+        public async Task<ActionResult<IEnumerable<StatistiekItemDto>>> GetEenmaligeNoteringen([FromQuery] int aantal = 20)
         {
             var result = await _context.Database
-                .SqlQuery<EenmaligeNoteringDto>($"EXEC GetEenmaligeNoteringen @Aantal = {aantal}")
+                .SqlQuery<StatistiekItemDto>($"EXEC GetEenmaligeNoteringen @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
 
-        // 10. TOP ARTIESTEN PER JAAR -> Deze bleef hetzelfde (gebruikte al een eigen DTO)
+        // 10. Top Artiesten Per Jaar (Gebruikt een andere DTO!)
         [HttpGet("top-artiesten/{jaar}")]
-        public async Task<ActionResult<IEnumerable<ArtiestStatistiekDto>>> GetTopArtiestenPerJaar(int jaar, int aantal = 3)
+        public async Task<ActionResult<IEnumerable<TopArtiestDto>>> GetTopArtiesten(int jaar, [FromQuery] int aantal = 3)
         {
             var result = await _context.Database
-                .SqlQuery<ArtiestStatistiekDto>($"EXEC GetTopArtiestenPerJaar @Jaar = {jaar}, @Aantal = {aantal}")
+                .SqlQuery<TopArtiestDto>($"EXEC GetTopArtiestenPerJaar @Jaar = {jaar}, @Aantal = {aantal}")
                 .ToListAsync();
             return Ok(result);
         }
+    }
+
+    // Extra DTO specifiek voor statistiek 10
+    public class TopArtiestDto
+    {
+        public string Naam { get; set; } = string.Empty;
+        public int AantalLiedjes { get; set; }
+        public int? GemiddeldePositie { get; set; } // Kan null zijn als SQL AVG int/null teruggeeft
+        public int HoogsteNotering { get; set; }
     }
 }

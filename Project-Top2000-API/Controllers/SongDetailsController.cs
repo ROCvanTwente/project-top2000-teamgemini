@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TemplateJwtProject.Data;
 using TemplateJwtProject.Models;
+using TemplateJwtProject.Models.DTOs;
 
 namespace TemplateJwtProject.Controllers
 {
@@ -26,24 +27,25 @@ namespace TemplateJwtProject.Controllers
             if (song == null)
                 return NotFound($"Song met id {songId} niet gevonden.");
 
-            var top2000Positions = await _context.Set<Top2000Entry>()
+            var chartHistory = await _context.Set<Top2000Entry>()
                 .Where(entry => entry.SongId == songId)
                 .OrderByDescending(entry => entry.Year)
-                .Select(entry => new
+                .Select(entry => new ChartDto
                 {
                     Year = entry.Year,
                     Position = entry.Position
                 })
                 .ToListAsync();
 
-            var result = new
+            var result = new Songsdto
             {
                 SongId = song.SongId,
-                Title = song.Titel,
-                Artist = song.Artist.Name,
-                ReleaseYear = song.ReleaseYear,
+                Titel = song.Titel,
+                ArtistName = song.Artist?.Name ?? "",
                 Lyrics = song.Lyrics,
-                Top2000Positions = top2000Positions
+                ReleaseYear = song.ReleaseYear,
+                ArtistBiography = song.Artist?.Biography,
+                ChartHistory = chartHistory
             };
 
             return Ok(result);

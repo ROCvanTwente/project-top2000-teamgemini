@@ -62,7 +62,7 @@ builder.Services.AddAuthentication(options =>
 // CORS configuratie - read origins from configuration
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
-                     ?? new[] { "http://localhost:5174", "https://localhost:5174" };
+                     ?? new[] { "http://localhost:5175", "https://localhost:5175" };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);

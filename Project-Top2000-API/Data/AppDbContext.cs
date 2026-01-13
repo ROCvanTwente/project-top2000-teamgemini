@@ -12,6 +12,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Songs> Songs { get; set; } = null!;
+    public DbSet<Artist> Artist { get; set; } = null!;
+    public DbSet<Top2000Entry> Top2000Entry { get; set; } = null!;
+
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

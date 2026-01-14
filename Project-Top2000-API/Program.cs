@@ -145,12 +145,17 @@ app.UseSwaggerUI();
 // =======================
 app.UseRouting();
 
-app.UseCors("DefaultCorsPolicy");
-
-if (!app.Environment.IsDevelopment())
+app.Use(async (context, next) =>
 {
-    app.UseHttpsRedirection();
-}
+    if (context.Request.Method == HttpMethods.Options)
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.CompleteAsync();
+        return;
+    }
+
+    await next();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

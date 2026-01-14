@@ -9,19 +9,22 @@ using TemplateJwtProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// =======================
+// Add services
+// =======================
 
 // Allow disabling database/identity during development
 var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", false);
 Console.WriteLine($"UseDatabase: {useDatabase}");
 
-// Database configuratie (conditional)
+// -----------------------
+// Database & Identity
+// -----------------------
 if (useDatabase)
 {
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    // Identity configuratie
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequireDigit = true;
@@ -35,9 +38,12 @@ if (useDatabase)
     .AddDefaultTokenProviders();
 }
 
-// JWT Authentication configuratie
+// -----------------------
+// JWT Authentication
+// -----------------------
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
+var secretKey = jwtSettings["SecretKey"]
+    ?? throw new InvalidOperationException("JWT SecretKey is not configured");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,55 +65,75 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS configuratie - read origins from configuration
+// -----------------------
+// CORS
+// -----------------------
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
-                     ?? new[] { "http://localhost:5173", "https://localhost:5173", "https://teamgeminiapi.runasp.net", "http://teamgeminiapi.runasp.net" };
+    ?? new[]
+    {
+        "http://localhost:5173",
+        "https://localhost:5173",
+        "https://teamgeminiapi.runasp.net",
+        "http://teamgeminiapi.runasp.net"
+    };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);
-Console.WriteLine("CORS allowed origins: " + string.Join(", ", allowedOrigins));
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DefaultCorsPolicy", policyBuilder =>
+    options.AddPolicy("DefaultCorsPolicy", policy =>
     {
-        policyBuilder
+        policy
             .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
-            // If your frontend uses cookies or fetch(..., { credentials: 'include' })
-            // enable credentials (and ensure origins are explicit, not '*')
             .AllowCredentials();
     });
 });
 
-// Services
+// -----------------------
+// Application services
+// -----------------------
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddControllers();
-// Use Swagger/OpenAPI compatible with .NET 10
-builder.Services.AddEndpointsApiExplorer();
 
+// =======================
+// Swagger (MINIMAL)
+// =======================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Initialiseer rollen (only when database/identity is enabled)
+// =======================
+// Swagger middleware
+// =======================
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+// =======================
+// Role initialization
+// =======================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await RoleInitializer.InitializeAsync(services);
 }
 
-// Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
+// =======================
+// Middleware pipeline
+// =======================
 app.UseRouting();
 
-// IMPORTANT: call __UseCors__ before authentication/authorization and HTTPS redirection
-// to prevent preflight requests from being redirected (which causes CORS errors)
 app.UseCors("DefaultCorsPolicy");
 
-// Only use HTTPS redirection in production to avoid CORS preflight redirect issues in development
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();

@@ -22,8 +22,20 @@ Console.WriteLine($"UseDatabase: {useDatabase}");
 // -----------------------
 if (useDatabase)
 {
+    //builder.Services.AddDbContext<AppDbContext>(options =>
+    //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }));
 
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
@@ -112,20 +124,20 @@ var app = builder.Build();
 // =======================
 // Swagger middleware
 // =======================
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+///}
 
 // =======================
 // Role initialization
 // =======================
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await RoleInitializer.InitializeAsync(services);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    await RoleInitializer.InitializeAsync(services);
+//}
 
 // =======================
 // Middleware pipeline

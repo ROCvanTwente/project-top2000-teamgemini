@@ -86,8 +86,8 @@ var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
     {
         "http://localhost:5173",
         "https://localhost:5173",
-        "https://teamgeminiapi.runasp.net",
-        "http://teamgeminiapi.runasp.net"
+        "https://demotop2000.runasp.net",
+        "http://demotop2000.runasp.net"
     };
 
 builder.Logging.AddConsole();

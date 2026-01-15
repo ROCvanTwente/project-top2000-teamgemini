@@ -38,29 +38,29 @@ namespace TemplateJwtProject.Controllers
                 })
                 .ToList();
 
-            //    var result = new Songsdto
-            //    {
-            //        SongId = song.SongId,
-            //        Title = song.Titel,
-            //        Artist = song.Artist.Name,
-            //        ReleaseYear = song.ReleaseYear,
-            //        ImgUrl = song.ImgUrl,
-            //        Youtube = song.Youtube,
-            //        Lyrics = song.Lyrics,
+        //    var result = new Songsdto
+        //    {
+        //        SongId = song.SongId,
+        //        Title = song.Titel,
+        //        Artist = song.Artist.Name,
+        //        ReleaseYear = song.ReleaseYear,
+        //        ImgUrl = song.ImgUrl,
+        //        Youtube = song.Youtube,
+        //        Lyrics = song.Lyrics,
 
-            //        Stats = new
-            //        {
-            //            TimesListed = positions.Count,
-            //            HighestPosition = positions.Any()
-            //? (int?)positions.Min(p => p.Position)
-            //: null,
-            //            FirstYear = positions.LastOrDefault()?.Year,
-            //            LastYear = positions.FirstOrDefault()?.Year
-            //        },
+        //        Stats = new
+        //        {
+        //            TimesListed = positions.Count,
+        //            HighestPosition = positions.Any()
+        //? (int?)positions.Min(p => p.Position)
+        //: null,
+        //            FirstYear = positions.LastOrDefault()?.Year,
+        //            LastYear = positions.FirstOrDefault()?.Year
+        //        },
 
 
-            //        Top2000Positions = positions
-            //    };
+        //        Top2000Positions = positions
+        //    };
             var result = new Songsdto();
 
             return Ok(result);

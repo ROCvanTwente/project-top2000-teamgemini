@@ -106,6 +106,56 @@ namespace TemplateJwtProject.Controllers
             return Ok(artists);
         }
 
+        /// <summary>
+        /// GET: api/Artist/{id}
+        /// Haalt een specifieke artiest op via ID
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetArtistById(int id)
+        {
+            var artist = await _context.Set<TemplateJwtProject.Models.Artist>()
+                .Include(a => a.Songs)
+                .FirstOrDefaultAsync(a => a.ArtistId == id);
+
+            if (artist == null)
+            {
+                return NotFound($"Artist with ID {id} not found");
+            }
+
+            return Ok(artist);
+        }
+
+        /// <summary>
+        /// GET: api/Artist/{id}/songs
+        /// Haalt alle nummers van een specifieke artiest op
+        /// </summary>
+        [HttpGet("{id}/songs")]
+        public async Task<IActionResult> GetArtistSongs(int id)
+        {
+            var artist = await _context.Set<TemplateJwtProject.Models.Artist>()
+                .Include(a => a.Songs)
+                .ThenInclude(s => s.Top2000Entries)
+                .FirstOrDefaultAsync(a => a.ArtistId == id);
+
+            if (artist == null)
+            {
+                return NotFound($"Artist with ID {id} not found");
+            }
+
+            var songs = artist.Songs.Select(s => new
+            {
+                songId = s.SongId,
+                title = s.Titel,
+                artist = artist.Name,
+                releaseYear = s.ReleaseYear,
+                youtubeLink = s.Youtube,
+                timesListed = s.Top2000Entries.Count(),
+                highestPosition = s.Top2000Entries.Any() ? s.Top2000Entries.Min(e => e.Position) : (int?)null
+            }).ToList();
+
+            return Ok(songs);
+        }
+
         public static string GetControllerName()
         {
             return "ArtiestenOverzicht";

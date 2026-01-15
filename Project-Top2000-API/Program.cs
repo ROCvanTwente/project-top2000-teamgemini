@@ -22,8 +22,20 @@ Console.WriteLine($"UseDatabase: {useDatabase}");
 // -----------------------
 if (useDatabase)
 {
+    //builder.Services.AddDbContext<AppDbContext>(options =>
+    //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }));
 
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
@@ -74,8 +86,10 @@ var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
     {
         "http://localhost:5173",
         "https://localhost:5173",
-        "https://teamgeminiapi.runasp.net",
-        "http://teamgeminiapi.runasp.net"
+        "https://demotop2000.runasp.net",
+        "http://demotop2000.runasp.net",
+        "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app"
+
     };
 
 builder.Logging.AddConsole();
@@ -114,18 +128,18 @@ var app = builder.Build();
 // =======================
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-//}
+app.UseSwagger();
+app.UseSwaggerUI();
+///}
 
 // =======================
 // Role initialization
 // =======================
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await RoleInitializer.InitializeAsync(services);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    await RoleInitializer.InitializeAsync(services);
+//}
 
 // =======================
 // Middleware pipeline

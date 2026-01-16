@@ -36,19 +36,12 @@ namespace TemplateJwtProject.Controllers
             return Ok("Liedje bijgewerkt");
         }
 
-        [HttpGet("search")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> SearchSongs([FromQuery] int? id, [FromQuery] string? titel)
+        public async Task<IActionResult> GetSong(int id)
         {
-            var query = _context.Songs.AsQueryable();
-
-            if (id.HasValue)
-                query = query.Where(s => s.SongId == id.Value);
-
-            if (!string.IsNullOrWhiteSpace(titel))
-                query = query.Where(s => s.Titel!.Contains(titel));
-
-            var songs = await query
+            var song = await _context.Songs
+                .Where(s => s.SongId == id)
                 .Select(s => new {
                     songId = s.SongId,
                     titel = s.Titel ?? null,
@@ -59,12 +52,9 @@ namespace TemplateJwtProject.Controllers
                     lyrics = s.Lyrics ?? null,
                     youtube = s.Youtube ?? null
                 })
-                .ToListAsync();
-
-            if (!songs.Any()) return NotFound("Geen liedjes gevonden");
-
-            return Ok(songs);
+                .FirstOrDefaultAsync();
+            if (song == null) return NotFound("Liedje niet gevonden");
+            return Ok(song);
         }
-
     }
 }

@@ -14,7 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 // =======================
 
 // Database & Identity instellingen ophalen
-var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", false);
+// Use a nullable getter so we can provide a true default when no configuration value is present
+var useDatabase = builder.Configuration.GetValue<bool?>("UseDatabase") ?? true;
 Console.WriteLine($"UseDatabase: {useDatabase}");
 
 // -----------------------
@@ -137,7 +138,12 @@ using (var scope = app.Services.CreateScope())
     // Check of database aan staat
     var dbEnabled = configuration.GetValue<bool>("UseDatabase", false);
 
-    if (dbEnabled)
+    // Only run migrations and seeding when AutoMigrate is explicitly enabled.
+    // This prevents the application from creating tables or inserting data into an
+    // existing database when you just want to connect to it.
+    var autoMigrate = configuration.GetValue<bool>("AutoMigrate", false);
+
+    if (dbEnabled && autoMigrate)
     {
         try
         {

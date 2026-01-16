@@ -184,10 +184,9 @@ app.UseSwaggerUI();
 // =======================
 // Middleware pipeline
 // =======================
-// CORS must be placed before UseRouting and other middleware
-app.UseCors("DefaultCorsPolicy");
-
 app.UseRouting();
+
+app.UseCors("DefaultCorsPolicy");
 
 if (!app.Environment.IsDevelopment())
 {

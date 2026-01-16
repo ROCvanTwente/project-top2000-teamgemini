@@ -86,6 +86,8 @@ var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
     {
         "http://localhost:5173",
         "https://localhost:5173",
+        "https://localhost:5237",
+        "http://localhost:5237",
         "https://demotop2000.runasp.net",
         "http://demotop2000.runasp.net",
         "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app"

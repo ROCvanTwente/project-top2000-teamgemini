@@ -81,7 +81,6 @@ namespace TemplateJwtProject.Controllers
             return Ok();
         }
 
-        // 🔹 DELETE playlist
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlaylist(int id)
         {

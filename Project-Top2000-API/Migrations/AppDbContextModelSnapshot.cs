@@ -243,7 +243,47 @@ namespace TemplateJwtProject.Migrations
 
                     b.HasKey("ArtistId");
 
-                    b.ToTable("Artist");
+                    b.ToTable("Artist", (string)null);
+                });
+
+            modelBuilder.Entity("TemplateJwtProject.Models.Playlist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Playlists");
+                });
+
+            modelBuilder.Entity("TemplateJwtProject.Models.PlaylistSong", b =>
+                {
+                    b.Property<int>("PlayListId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AddedAT")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PlayListId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("PlaylistSongs");
                 });
 
             modelBuilder.Entity("TemplateJwtProject.Models.RefreshToken", b =>
@@ -318,7 +358,7 @@ namespace TemplateJwtProject.Migrations
 
                     b.HasIndex("ArtistId");
 
-                    b.ToTable("Songs");
+                    b.ToTable("Songs", (string)null);
                 });
 
             modelBuilder.Entity("TemplateJwtProject.Models.Top2000Entry", b =>
@@ -334,7 +374,7 @@ namespace TemplateJwtProject.Migrations
 
                     b.HasKey("SongId", "Year");
 
-                    b.ToTable("Top2000Entry");
+                    b.ToTable("Top2000Entry", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -388,6 +428,35 @@ namespace TemplateJwtProject.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TemplateJwtProject.Models.Playlist", b =>
+                {
+                    b.HasOne("TemplateJwtProject.Models.ApplicationUser", "User")
+                        .WithMany("PlayLists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TemplateJwtProject.Models.PlaylistSong", b =>
+                {
+                    b.HasOne("TemplateJwtProject.Models.Playlist", "PlayList")
+                        .WithMany("PlayListSongs")
+                        .HasForeignKey("PlayListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TemplateJwtProject.Models.Songs", "Song")
+                        .WithMany("PlayListSongs")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlayList");
+
+                    b.Navigation("Song");
+                });
+
             modelBuilder.Entity("TemplateJwtProject.Models.RefreshToken", b =>
                 {
                     b.HasOne("TemplateJwtProject.Models.ApplicationUser", "User")
@@ -404,8 +473,9 @@ namespace TemplateJwtProject.Migrations
                     b.HasOne("TemplateJwtProject.Models.Artist", "Artist")
                         .WithMany("Songs")
                         .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Songs_Artist_ArtistId");
 
                     b.Navigation("Artist");
                 });
@@ -421,13 +491,25 @@ namespace TemplateJwtProject.Migrations
                     b.Navigation("Songs");
                 });
 
+            modelBuilder.Entity("TemplateJwtProject.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("PlayLists");
+                });
+
             modelBuilder.Entity("TemplateJwtProject.Models.Artist", b =>
                 {
                     b.Navigation("Songs");
                 });
 
+            modelBuilder.Entity("TemplateJwtProject.Models.Playlist", b =>
+                {
+                    b.Navigation("PlayListSongs");
+                });
+
             modelBuilder.Entity("TemplateJwtProject.Models.Songs", b =>
                 {
+                    b.Navigation("PlayListSongs");
+
                     b.Navigation("Top2000Entries");
                 });
 #pragma warning restore 612, 618

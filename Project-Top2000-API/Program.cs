@@ -13,8 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services
 // =======================
 
-// Allow disabling database/identity during development
-var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", false);
+// Database & Identity instellingen ophalen
+// Use a nullable getter so we can provide a true default when no configuration value is present
+var useDatabase = builder.Configuration.GetValue<bool?>("UseDatabase") ?? true;
 Console.WriteLine($"UseDatabase: {useDatabase}");
 
 // -----------------------
@@ -86,6 +87,8 @@ var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
     {
         "http://localhost:5173",
         "https://localhost:5173",
+        "https://localhost:5237",
+        "http://localhost:5237",
         "https://demotop2000.runasp.net",
         "http://demotop2000.runasp.net",
         "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app"
@@ -113,6 +116,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+// Controllers & Swagger/OpenAPI
 builder.Services.AddControllers();
 
 // =======================
@@ -123,6 +127,50 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// ==========================================
+// 2. INITIALISATIE (Database & Seeding)
+// ==========================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var configuration = services.GetRequiredService<IConfiguration>();
+
+    // Check of database aan staat
+    var dbEnabled = configuration.GetValue<bool>("UseDatabase", false);
+
+    // Only run migrations and seeding when AutoMigrate is explicitly enabled.
+    // This prevents the application from creating tables or inserting data into an
+    // existing database when you just want to connect to it.
+    var autoMigrate = configuration.GetValue<bool>("AutoMigrate", false);
+
+    if (dbEnabled && autoMigrate)
+    {
+        try
+        {
+            var dbContext = services.GetRequiredService<AppDbContext>();
+            // Automatisch database en tabellen aanmaken indien nodig
+            await dbContext.Database.MigrateAsync();
+
+            // Rollen en admin users aanmaken
+            await RoleInitializer.InitializeAsync(services);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fout bij initialiseren database: {ex.Message}");
+        }
+    }
+}
+
+// ==========================================
+// 3. MIDDLEWARE PIPELINE
+// ==========================================
+
+// Swagger UI activeren (zodat je endpoints kunt zien op /swagger)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 // =======================
 // Swagger middleware
 // =======================

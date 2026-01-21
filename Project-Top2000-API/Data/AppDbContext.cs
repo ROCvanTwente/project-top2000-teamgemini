@@ -13,15 +13,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Songs> Songs { get; set; } = null!;
-    public DbSet<Artist> Artist { get; set; } = null!;
-    public DbSet<Top2000Entry> Top2000Entry { get; set; } = null!;
-
-
-
+    public DbSet<Artist> Artists { get; set; } = null!;
+    public DbSet<Top2000Entry> Top2000Entries { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         // RefreshToken configuratie
         builder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
@@ -32,8 +29,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<RefreshToken>()
             .HasIndex(rt => rt.Token)
             .IsUnique();
-        builder.Entity<Top2000Entry>()
-    .HasKey(e => new { e.SongId, e.Year });
 
+        // Top2000Entry configuratie
+        builder.Entity<Top2000Entry>()
+            .HasKey(e => new { e.SongId, e.Year });
+
+        // Tabellen correct mappen
+        builder.Entity<Artist>().ToTable("Artist");
+        builder.Entity<Top2000Entry>().ToTable("Top2000Entry");
     }
+
+
+
 }

@@ -51,16 +51,18 @@ namespace TemplateJwtProject.Controllers
         }
 
         // =================================================================
-        // 3. ALLE EDITIES (Geen specifiek jaar nodig)
+        // 3. GetEvergreens (De 'Evergreens' of onverwoestbaren)
         // =================================================================
-        [HttpGet("alle-edities")]
-        public async Task<ActionResult<IEnumerable<BasisStatistiekDto>>> GetAlleEdities([FromQuery] int aantal = 50)
+        [HttpGet("evergreens")]
+        public async Task<ActionResult<IEnumerable<BasisStatistiekDto>>> GetEvergreens([FromQuery] int aantal = 50)
         {
+            // Validatie aanpassen: jaar is null, aantal checken
             var validatieFout = ValideerInput(null, aantal);
             if (validatieFout != null) return validatieFout;
 
+            // Hier roep je de nieuwe SP naam aan
             var result = await _context.Database
-                .SqlQuery<BasisStatistiekDto>($"EXEC GetAlleEdities @Aantal = {aantal}")
+                .SqlQuery<BasisStatistiekDto>($"EXEC GetEvergreens @Aantal = {aantal}")
                 .ToListAsync();
 
             return Ok(result);

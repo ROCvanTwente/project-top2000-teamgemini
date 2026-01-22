@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using TemplateJwtProject.Models;
 
 namespace TemplateJwtProject.Models
 {
@@ -7,8 +8,6 @@ namespace TemplateJwtProject.Models
     {
         [Key]
         public int SongId { get; set; }
-
-        // Foreign key
         public int ArtistId { get; set; }
 
         public string Titel { get; set; } = null!;
@@ -17,9 +16,11 @@ namespace TemplateJwtProject.Models
         public string? Lyrics { get; set; }
         public string? Youtube { get; set; }
 
-        // Navigatie-eigenschappen
-        [JsonIgnore]
         public Artist Artist { get; set; } = null!;
-        public ICollection<Top2000Entry> Top2000Entries { get; set; } = new List<Top2000Entry>();
+        public ICollection<Top2000Entry> Top2000Entries { get; set; }
+            = new List<Top2000Entry>();
+
+        public ICollection<PlaylistSong> PlayListSongs { get; set; } = new List<PlaylistSong>();
     }
+
 }

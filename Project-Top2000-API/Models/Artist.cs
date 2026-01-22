@@ -9,6 +9,8 @@ namespace TemplateJwtProject.Models
         public string? Wiki { get; set; }
         public string? Biography { get; set; }
         public string? Photo { get; set; }
+        public string? SpotifyLink { get; set; }
+        public string? YoutubeLink { get; set; }
 
 
         // Navigatie-eigenschap (EF Core)

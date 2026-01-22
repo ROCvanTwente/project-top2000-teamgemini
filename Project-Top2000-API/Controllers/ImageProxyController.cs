@@ -37,13 +37,13 @@ namespace TemplateJwtProject.Controllers
                     return StatusCode((int)response.StatusCode, "Failed to fetch image");
                 }
 
-                var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
-                var imageStream = await response.Content.ReadAsStreamAsync();
+                var contentType = response.Content.Headers.ContentType?.MediaType ?? "image/png";
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
 
                 // Return with proper CORS headers
-                var result = File(imageStream, contentType);
                 Response.Headers.Add("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
-                return result;
+                Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                return File(imageBytes, contentType);
             }
             catch (Exception ex)
             {

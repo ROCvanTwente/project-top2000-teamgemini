@@ -18,8 +18,9 @@ namespace TemplateJwtProject.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        //[Authorize(Roles = "admin")]
         [AllowAnonymous]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSong(int id, [FromBody] UpdateSongDto dto)
         {
             var song = await _context.Songs.FindAsync(id);
@@ -36,9 +37,10 @@ namespace TemplateJwtProject.Controllers
             return Ok("Liedje bijgewerkt");
         }
 
-        [HttpGet("search")]
+        //[Authorize(Roles = "admin")]
         [AllowAnonymous]
-        public async Task<IActionResult> SearchSongs([FromQuery] int? id, [FromQuery] string? titel)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchSongs([FromQuery] int? id, [FromQuery] string? titel, [FromQuery] string? artistname)
         {
             var query = _context.Songs.AsQueryable();
 
@@ -47,6 +49,11 @@ namespace TemplateJwtProject.Controllers
 
             if (!string.IsNullOrWhiteSpace(titel))
                 query = query.Where(s => s.Titel!.Contains(titel));
+
+            if (!string.IsNullOrWhiteSpace(artistname))
+                query = query.Where(s => s.Artist != null &&
+                                         s.Artist.Name.Contains(artistname));
+
 
             var songs = await query
                 .Select(s => new {

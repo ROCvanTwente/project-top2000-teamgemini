@@ -43,6 +43,8 @@ namespace TemplateJwtProject.Controllers
 
                 var song = await _context.Set<Songs>()
 
+                              .AsNoTracking()
+
                               .Include(s => s.Artist)
 
                               .Include(s => s.Top2000Entries)
@@ -52,6 +54,9 @@ namespace TemplateJwtProject.Controllers
                 if (song == null)
 
                     return NotFound($"Song met id {songId} niet gevonden.");
+
+                // Debug: Log the Spotify value
+                System.Diagnostics.Debug.WriteLine($"Spotify value: {song.Spotify}");
 
                 var positions = song.Top2000Entries
 

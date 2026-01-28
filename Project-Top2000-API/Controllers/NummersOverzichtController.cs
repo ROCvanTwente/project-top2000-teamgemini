@@ -29,8 +29,8 @@ namespace TemplateJwtProject.Controllers
                     Title = s.Titel,
                     Artist = s.Artist.Name,
                     ReleaseYear = s.ReleaseYear,
-                    ImgUrl = s.ImgUrl,
-                    Spotify = s.Spotify,
+                    ImgUrl = s.ImageUrl,
+                    Spotify = s.SpotifyLink,
                     TimesListed = s.Top2000Entries.Count,
                     HighestPosition = s.Top2000Entries.Any()
                         ? (int?)s.Top2000Entries.Min(e => e.Position)

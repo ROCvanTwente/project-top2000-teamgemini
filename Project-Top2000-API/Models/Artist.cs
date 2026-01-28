@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace TemplateJwtProject.Models
 {
@@ -9,8 +10,13 @@ namespace TemplateJwtProject.Models
         public string? Wiki { get; set; }
         public string? Biography { get; set; }
         public string? Photo { get; set; }
+
+        [NotMapped]
         public string? SpotifyLink { get; set; }
+
+        [NotMapped]
         public string? YoutubeLink { get; set; }
+
 
 
         // Navigatie-eigenschap (EF Core)

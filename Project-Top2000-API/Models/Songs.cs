@@ -12,8 +12,8 @@ namespace TemplateJwtProject.Models
 
         public string Titel { get; set; } = null!;
         public int? ReleaseYear { get; set; }
-        public string? ImageUrl { get; set; }
-        public string? SpotifyLink { get; set; }
+        public string? ImgUrl { get; set; }
+        public string? Spotify { get; set; }
         public string? Lyrics { get; set; }
         public string? Youtube { get; set; }
 

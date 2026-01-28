@@ -26,15 +26,6 @@ namespace TemplateJwtProject.Controllers
             var artists = await _context.Set<TemplateJwtProject.Models.Artist>()
                 .Include(a => a.Songs)
                 .OrderBy(a => a.Name)
-                .Select(a => new
-                {
-                    a.ArtistId,
-                    a.Name,
-                    a.Biography,
-                    a.Photo,
-                    Songs = a.Songs,
-                    SongCount = a.Songs.Count()
-                })
                 .ToListAsync();
             return Ok(artists);
         }

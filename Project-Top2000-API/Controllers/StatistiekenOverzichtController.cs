@@ -194,7 +194,7 @@ namespace TemplateJwtProject.Controllers
         public int ArtistId { get; set; }
         public string Naam { get; set; } = string.Empty;
         public int AantalLiedjes { get; set; }
-        public int? GemiddeldePositie { get; set; }
+        public decimal? GemiddeldePositie { get; set; }
         public int HoogsteNotering { get; set; }
     }
 }

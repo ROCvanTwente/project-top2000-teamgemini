@@ -16,11 +16,9 @@ namespace TemplateJwtProject.Controllers
             _context = context;
         }
 
-        // =================================================================
         // 1. DALERS
-        // =================================================================
         [HttpGet("dalers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<DalerDto>>> GetDalers(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<DalerDto>>> GetDalers(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -33,11 +31,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 2. STIJGERS
-        // =================================================================
         [HttpGet("stijgers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<StijgerDto>>> GetStijgers(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<StijgerDto>>> GetStijgers(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -50,17 +46,13 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 3. GetEvergreens (De 'Evergreens' of onverwoestbaren)
-        // =================================================================
         [HttpGet("evergreens")]
-        public async Task<ActionResult<IEnumerable<BasisStatistiekDto>>> GetEvergreens([FromQuery] int aantal = 50)
+        public async Task<ActionResult<IEnumerable<BasisStatistiekDto>>> GetEvergreens([FromQuery] int aantal = 2000)
         {
-            // Validatie aanpassen: jaar is null, aantal checken
             var validatieFout = ValideerInput(null, aantal);
             if (validatieFout != null) return validatieFout;
 
-            // Hier roep je de nieuwe SP naam aan
             var result = await _context.Database
                 .SqlQuery<BasisStatistiekDto>($"EXEC GetEvergreens @Aantal = {aantal}")
                 .ToListAsync();
@@ -68,11 +60,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 4. NIEUWE BINNENKOMERS
-        // =================================================================
         [HttpGet("nieuwe-binnenkomers/{jaar}")]
-        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetNieuweBinnenkomers(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetNieuweBinnenkomers(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -85,11 +75,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 5. VERDWENEN
-        // =================================================================
         [HttpGet("verdwenen/{jaar}")]
-        public async Task<ActionResult<IEnumerable<VerdwenenDto>>> GetVerdwenen(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<VerdwenenDto>>> GetVerdwenen(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -102,11 +90,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 6. OPNIEUW BINNEN
-        // =================================================================
         [HttpGet("opnieuw-binnen/{jaar}")]
-        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetOpnieuwBinnen(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetOpnieuwBinnen(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -119,11 +105,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 7. STABIEL
-        // =================================================================
         [HttpGet("stabiel/{jaar}")]
-        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetStabiel(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetStabiel(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -136,11 +120,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 8. AANSLUITENDE POSITIES
-        // =================================================================
         [HttpGet("aansluitende-posities/{jaar}")]
-        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetAansluitendePosities(int jaar, [FromQuery] int aantal = 10)
+        public async Task<ActionResult<IEnumerable<PositieStatistiekDto>>> GetAansluitendePosities(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -152,12 +134,10 @@ namespace TemplateJwtProject.Controllers
             if (result.Count == 0) return NotFound($"Geen aansluitende posities gevonden voor het jaar {jaar}.");
             return Ok(result);
         }
-
-        // =================================================================
+        
         // 9. EENMALIGE NOTERINGEN (Geen jaar nodig)
-        // =================================================================
         [HttpGet("eenmalige-noteringen")]
-        public async Task<ActionResult<IEnumerable<EenmaligDto>>> GetEenmaligeNoteringen([FromQuery] int aantal = 20)
+        public async Task<ActionResult<IEnumerable<EenmaligDto>>> GetEenmaligeNoteringen([FromQuery] int aantal = 5000)
         {
             var validatieFout = ValideerInput(null, aantal);
             if (validatieFout != null) return validatieFout;
@@ -169,11 +149,9 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // 10. TOP ARTIESTEN PER JAAR
-        // =================================================================
         [HttpGet("top-artiesten/{jaar}")]
-        public async Task<ActionResult<IEnumerable<TopArtiestDto>>> GetTopArtiesten(int jaar, [FromQuery] int aantal = 3)
+        public async Task<ActionResult<IEnumerable<TopArtiestDto>>> GetTopArtiesten(int jaar, [FromQuery] int aantal = 2000)
         {
             var validatieFout = ValideerInput(jaar, aantal);
             if (validatieFout != null) return validatieFout;
@@ -186,9 +164,7 @@ namespace TemplateJwtProject.Controllers
             return Ok(result);
         }
 
-        // =================================================================
         // PRIVATE HULPMETHODE VOOR VALIDATIE
-        // =================================================================
         private ActionResult? ValideerInput(int? jaar, int aantal)
         {
             // 1. Check Aantal
@@ -215,6 +191,7 @@ namespace TemplateJwtProject.Controllers
     // Specifieke DTO voor endpoint 10
     public class TopArtiestDto
     {
+        public int ArtistId { get; set; }
         public string Naam { get; set; } = string.Empty;
         public int AantalLiedjes { get; set; }
         public int? GemiddeldePositie { get; set; }

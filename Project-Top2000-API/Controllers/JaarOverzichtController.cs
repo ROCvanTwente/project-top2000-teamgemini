@@ -31,6 +31,8 @@ namespace TemplateJwtProject.Controllers
                     Title = entry.Songs.Titel,
                     Artist = entry.Songs.Artist.Name,
                     ReleaseYear = entry.Songs.ReleaseYear,
+                    ImgUrl = entry.Songs.ImgUrl,
+
                 })
                 .ToListAsync();
 

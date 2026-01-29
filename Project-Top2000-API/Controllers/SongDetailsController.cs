@@ -87,6 +87,8 @@ namespace TemplateJwtProject.Controllers
 
                     Lyrics = song.Lyrics,
 
+                    Spotify = song.Spotify,
+
                     Stats = new
 
                     {

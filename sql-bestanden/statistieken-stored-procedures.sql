@@ -1,18 +1,23 @@
--- =============================================
--- BESTANDSNAAM: StatistiekenStoredProcedures_FIXED.sql
--- BESCHRIJVING: 10 stored procedures om de statistieken procedures in te laden.
--- STATUS: Gecorrigeerd naar juiste tabelnamen (Top2000Entry & Artist)
--- =============================================
+/* =========================================================================
+   MASTER SCRIPT: STATISTIEKEN STORED PROCEDURES (FINAL CORRECTED VERSION)
+   
+   CHANGES:
+   - Uses 'CREATE OR ALTER' to ensure updates apply immediately.
+   - Adds 'SongId' and 'ArtistId' to ALL procedures (1-9) to fix C# mapping errors.
+   - Adds 'ArtistId' to Procedure 10.
+   ========================================================================= */
 
 -- 1. DALERS
 GO
 CREATE OR ALTER PROCEDURE GetDalers
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      -- [Required for C# mapping]
+        a.ArtistId,    -- [Required for C# mapping]
         t_current.Position AS Positie,
         s.Titel,
         a.Name AS Artiest,
@@ -33,11 +38,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetStijgers
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      
+        a.ArtistId,    
         t_current.Position AS Positie,
         s.Titel,
         a.Name AS Artiest,
@@ -54,24 +61,25 @@ BEGIN
 END;
 GO
 
--- 3. DE EVERGREENS
+-- 3. EVERGREENS
 GO
 CREATE OR ALTER PROCEDURE GetEvergreens
-    @Aantal INT = 50
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
-    -- Let op: ook hier de tabelnaam aangepast voor de count
     DECLARE @TotaalAantalJaren INT = (SELECT COUNT(DISTINCT Year) FROM Top2000Entry);
 
     SELECT TOP (@Aantal)
+        s.SongId,      
+        a.ArtistId,    
         s.Titel,
         a.Name AS Artiest,
         s.ReleaseYear AS Uitgiftejaar
     FROM Songs s
     INNER JOIN Artist a ON s.ArtistId = a.ArtistId
     INNER JOIN Top2000Entry t ON s.SongId = t.SongId
-    GROUP BY s.Titel, a.Name, s.ReleaseYear
+    GROUP BY s.SongId, a.ArtistId, s.Titel, a.Name, s.ReleaseYear
     HAVING COUNT(DISTINCT t.Year) = @TotaalAantalJaren
     ORDER BY s.Titel;
 END;
@@ -81,11 +89,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetNieuweBinnenkomers
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      
+        a.ArtistId,    
         t.Position AS Positie,
         s.Titel,
         a.Name AS Artiest,
@@ -104,11 +114,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetVerdwenen
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      
+        a.ArtistId,    
         t_prev.Position AS PositieVorigJaar,
         s.Titel,
         a.Name AS Artiest,
@@ -126,11 +138,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetOpnieuwBinnen
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      -- FIXED: Was missing
+        a.ArtistId,    -- FIXED: Was missing
         t.Position AS Positie,
         s.Titel,
         a.Name AS Artiest,
@@ -149,11 +163,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetStabiel
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      -- FIXED: Was missing
+        a.ArtistId,    -- FIXED: Was missing
         t_current.Position AS Positie,
         s.Titel,
         a.Name AS Artiest,
@@ -171,11 +187,13 @@ GO
 GO
 CREATE OR ALTER PROCEDURE GetAansluitendePosities
     @Jaar INT,
-    @Aantal INT = 10
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT DISTINCT TOP (@Aantal)
+    SELECT TOP (@Aantal)
+        s1.SongId,     -- FIXED: Was missing
+        a.ArtistId,    -- FIXED: Was missing
         t1.Position AS Positie,
         s1.Titel,
         a.Name AS Artiest,
@@ -196,11 +214,13 @@ GO
 -- 9. EENMALIGE NOTERINGEN
 GO
 CREATE OR ALTER PROCEDURE GetEenmaligeNoteringen
-    @Aantal INT = 20
+    @Aantal INT = 5000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        s.SongId,      
+        a.ArtistId,    
         a.Name AS Artiest,
         s.Titel,
         s.ReleaseYear AS Uitgiftejaar,
@@ -209,30 +229,32 @@ BEGIN
     FROM Songs s
     INNER JOIN Artist a ON s.ArtistId = a.ArtistId
     INNER JOIN Top2000Entry t ON s.SongId = t.SongId
-    GROUP BY s.Titel, a.Name, s.ReleaseYear
+    GROUP BY s.SongId, a.ArtistId, s.Titel, a.Name, s.ReleaseYear
     HAVING COUNT(t.Year) = 1
-    ORDER BY a.Name, s.Titel;
+    ORDER BY MAX(t.Year) DESC, MAX(t.Position) ASC;
 END;
 GO
 
 -- 10. TOP ARTIESTEN PER JAAR
+-- NB: Zorg dat je C# DTO 'TopArtiestDto' een 'decimal?' of 'double?' gebruikt voor GemiddeldePositie!
 GO
 CREATE OR ALTER PROCEDURE GetTopArtiestenPerJaar
     @Jaar INT,
-    @Aantal INT = 3
+    @Aantal INT = 2000
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT TOP (@Aantal)
+        a.ArtistId,    -- [Required for C# mapping]
         a.Name AS Naam,
         COUNT(t.SongId) AS AantalLiedjes,
-        AVG(t.Position) AS GemiddeldePositie,
+        AVG(CAST(t.Position AS DECIMAL(10,2))) AS GemiddeldePositie, -- Returned as Decimal
         MIN(t.Position) AS HoogsteNotering
     FROM Top2000Entry t
     INNER JOIN Songs s ON t.SongId = s.SongId
     INNER JOIN Artist a ON s.ArtistId = a.ArtistId
     WHERE t.Year = @Jaar
-    GROUP BY a.Name
+    GROUP BY a.ArtistId, a.Name
     ORDER BY COUNT(t.SongId) DESC, MIN(t.Position) ASC;
 END;
 GO

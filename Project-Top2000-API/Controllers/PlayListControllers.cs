@@ -18,16 +18,13 @@ namespace TemplateJwtProject.Controllers
             _context = context;
         }
 
-        // ============================
-        // CREATE PLAYLIST
-        // ============================
         [HttpPost]
         public async Task<IActionResult> CreatePlaylist(CreatePlaylistDto dto)
         {
             var playlist = new Playlist
             {
                 Name = dto.Name,
-                UserId = null // later: User.FindFirstValue(ClaimTypes.NameIdentifier)
+                UserId = null
             };
 
             _context.Playlists.Add(playlist);
@@ -40,9 +37,7 @@ namespace TemplateJwtProject.Controllers
             });
         }
 
-        // ============================
-        // GET ALL PLAYLISTS (DTO)
-        // ============================
+        
         [HttpGet]
         public async Task<IActionResult> GetPlaylists()
         {
@@ -67,9 +62,7 @@ namespace TemplateJwtProject.Controllers
             return Ok(playlists);
         }
 
-        // ============================
-        // ADD SONG TO PLAYLIST
-        // ============================
+
         [HttpPost("{playlistId}/songs/{songId}")]
         public async Task<IActionResult> AddSongToPlaylist(
             int playlistId,
@@ -105,9 +98,7 @@ namespace TemplateJwtProject.Controllers
             return Ok();
         }
 
-        // ============================
-        // REMOVE SONG FROM PLAYLIST
-        // ============================
+
         [HttpDelete("{playlistId}/songs/{songId}")]
         public async Task<IActionResult> RemoveSongFromPlaylist(
             int playlistId,
@@ -127,9 +118,7 @@ namespace TemplateJwtProject.Controllers
             return NoContent();
         }
 
-        // ============================
-        // DELETE PLAYLIST
-        // ============================
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlaylist(int id)
         {

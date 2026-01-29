@@ -36,6 +36,7 @@ namespace TemplateJwtProject.Controllers
                         ? (int?)s.Top2000Entries.Min(e => e.Position)
                         : null
                 })
+                .OrderBy(s => s.Title)
                 .ToListAsync();
 
             return Ok(songs);

@@ -9,19 +9,35 @@ using TemplateJwtProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// =======================
+// Add services
+// =======================
 
-// Allow disabling database/identity during development
-var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", false);
+// Database & Identity instellingen ophalen
+// Use a nullable getter so we can provide a true default when no configuration value is present
+var useDatabase = builder.Configuration.GetValue<bool?>("UseDatabase") ?? true;
 Console.WriteLine($"UseDatabase: {useDatabase}");
 
-// Database configuratie (conditional)
+// -----------------------
+// Database & Identity
+// -----------------------
 if (useDatabase)
 {
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    //builder.Services.AddDbContext<AppDbContext>(options =>
+    //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    // Identity configuratie
+
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }));
+
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequireDigit = true;
@@ -35,9 +51,12 @@ if (useDatabase)
     .AddDefaultTokenProviders();
 }
 
-// JWT Authentication configuratie
+// -----------------------
+// JWT Authentication
+// -----------------------
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
+var secretKey = jwtSettings["SecretKey"]
+    ?? throw new InvalidOperationException("JWT SecretKey is not configured");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,55 +78,133 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS configuratie - read origins from configuration
+// -----------------------
+// CORS
+// -----------------------
 var corsSettings = builder.Configuration.GetSection("CorsSettings");
 var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>()
-                     ?? new[] { "http://localhost:5173", "https://localhost:5173" };
+    ?? new[]
+    {
+        "http://localhost:5173",
+        "https://localhost:5173",
+        "https://localhost:5237",
+        "http://localhost:5237",
+        "https://demotop2000.runasp.net",
+        "http://demotop2000.runasp.net",
+        "https://project-top2000-frontend-t-git-66b570-jaspers-projects-67505c09.vercel.app"
+
+    };
 
 builder.Logging.AddConsole();
 builder.Services.AddSingleton(_ => allowedOrigins);
-Console.WriteLine("CORS allowed origins: " + string.Join(", ", allowedOrigins));
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DefaultCorsPolicy", policyBuilder =>
+    options.AddPolicy("DefaultCorsPolicy", policy =>
     {
-        policyBuilder
+        policy
             .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
-            // If your frontend uses cookies or fetch(..., { credentials: 'include' })
-            // enable credentials (and ensure origins are explicit, not '*')
             .AllowCredentials();
     });
 });
 
-// Services
+// -----------------------
+// Application services
+// -----------------------
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+// Controllers & Swagger/OpenAPI
 builder.Services.AddControllers();
-// Use Swagger/OpenAPI compatible with .NET 10
-builder.Services.AddEndpointsApiExplorer();
 
+// =======================
+// Swagger (MINIMAL)
+// =======================
+
+// Controllers & Swagger/OpenAPI
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Initialiseer rollen (only when database/identity is enabled)
+// ==========================================
+// 2. INITIALISATIE (Database & Seeding)
+// ==========================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await RoleInitializer.InitializeAsync(services);
+    var configuration = services.GetRequiredService<IConfiguration>();
+
+    // Check of database aan staat
+    var dbEnabled = configuration.GetValue<bool>("UseDatabase", false);
+
+    // Only run migrations and seeding when AutoMigrate is explicitly enabled.
+    // This prevents the application from creating tables or inserting data into an
+    // existing database when you just want to connect to it.
+    var autoMigrate = configuration.GetValue<bool>("AutoMigrate", false);
+
+    if (dbEnabled && autoMigrate)
+    {
+        try
+        {
+            var dbContext = services.GetRequiredService<AppDbContext>();
+            // Automatisch database en tabellen aanmaken indien nodig
+            await dbContext.Database.MigrateAsync();
+
+            // Rollen en admin users aanmaken
+            await RoleInitializer.InitializeAsync(services);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fout bij initialiseren database: {ex.Message}");
+        }
+    }
 }
 
-// Ensure routing is enabled before applying CORS so the CORS middleware runs correctly with endpoint routing
+// ==========================================
+// 3. MIDDLEWARE PIPELINE
+// ==========================================
+
+// Swagger UI activeren (zodat je endpoints kunt zien op /swagger)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+// =======================
+// Swagger middleware
+// =======================
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+///}
+
+// =======================
+// Role initialization
+// =======================
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    await RoleInitializer.InitializeAsync(services);
+//}
+
+// =======================
+// Middleware pipeline
+// =======================
 app.UseRouting();
 
-// IMPORTANT: call __UseCors__ before authentication/authorization and HTTPS redirection
-// to prevent preflight requests from being redirected (which causes CORS errors)
 app.UseCors("DefaultCorsPolicy");
 
-// Only use HTTPS redirection in production to avoid CORS preflight redirect issues in development
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();

@@ -27,8 +27,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .HasMany(u => u.PlayLists)
             .WithOne(p => p.User)
             .HasForeignKey(p => p.UserId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.SetNull);
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+
 
 
         builder.Entity<RefreshToken>()

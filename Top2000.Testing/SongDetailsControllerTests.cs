@@ -57,5 +57,59 @@ namespace Top2000.Testing
             ok!.Value.Should().BeOfType<string>();
             ((string)ok.Value).Should().NotBeNullOrWhiteSpace();
         }
+
+        [Fact]
+        public async Task GetSongDetails_ReturnsStatsAndPositions_WhenSongHasEntries()
+        {
+            var dbName = Guid.NewGuid().ToString();
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(dbName)
+                .Options;
+
+            using var context = new AppDbContext(options);
+
+            var artist = new Artist { ArtistId = 10, Name = "Test Artist" };
+            var song = new Songs { SongId = 10, ArtistId = 10, Titel = "Test Song", ReleaseYear = 2000 };
+
+            context.Artists.Add(artist);
+            context.Songs.Add(song);
+            context.Top2000Entries.Add(new Top2000Entry { SongId = 10, Year = 2021, Position = 3 });
+            context.Top2000Entries.Add(new Top2000Entry { SongId = 10, Year = 2020, Position = 5 });
+            context.SaveChanges();
+
+            var controller = new SongDetailsController(context);
+
+            var result = await controller.GetSongDetails(10);
+
+            result.Should().BeOfType<OkObjectResult>();
+            var ok = result as OkObjectResult;
+            ok!.Value.Should().NotBeNull();
+
+            var value = ok.Value!;
+            var propStats = value.GetType().GetProperty("Stats");
+            propStats.Should().NotBeNull();
+            var stats = propStats.GetValue(value);
+            stats.Should().NotBeNull();
+
+            var timesListedProp = stats!.GetType().GetProperty("TimesListed");
+            timesListedProp.Should().NotBeNull();
+            timesListedProp.GetValue(stats).Should().Be(2);
+
+            var highestProp = stats.GetType().GetProperty("HighestPosition");
+            highestProp.Should().NotBeNull();
+            highestProp.GetValue(stats).Should().Be(3);
+
+            var topPositionsProp = value.GetType().GetProperty("Top2000Positions");
+            topPositionsProp.Should().NotBeNull();
+            var positions = topPositionsProp.GetValue(value) as System.Collections.IEnumerable;
+            positions.Should().NotBeNull();
+
+            var en = positions!.GetEnumerator();
+            en.MoveNext().Should().BeTrue();
+            var first = en.Current!;
+            var yearProp = first.GetType().GetProperty("Year");
+            yearProp.Should().NotBeNull();
+            yearProp.GetValue(first).Should().Be(2021);
+        }
     }
 }
